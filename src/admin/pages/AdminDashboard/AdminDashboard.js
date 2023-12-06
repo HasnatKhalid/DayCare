@@ -2,19 +2,57 @@
 import React from "react";
 import AdminHeader from "../../components/AdminHeader/AdminHeader";
 import AdminSidebar from "../../components/AdminSideBar/AdminSidebar";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const AdminDashboard = () => {
-  // Dummy data for demonstration
-  const bookings = [
-    { id: 1, petName: "Buddy", serviceType: "Dog Boarding", status: "Pending" },
-    {
-      id: 2,
-      petName: "Whiskers",
-      serviceType: "Cat Sitting",
-      status: "Confirmed",
-    },
-    // Add more booking data as needed
-  ];
+  // // Dummy data for demonstration
+  // const bookings = [
+  //   { id: 1, petName: "Buddy", serviceType: "Dog Boarding", status: "Pending" },
+  //   {
+  //     id: 2,
+  //     petName: "Whiskers",
+  //     serviceType: "Cat Sitting",
+  //     status: "Confirmed",
+  //   },
+  //   // Add more booking data as needed
+  // ];
+
+  const [bookings, setBookings] = useState()
+
+  
+
+  const getBookings = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/viewbookings', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (response.ok) {
+          const data = await response.json();
+          return data;
+          
+      } else {
+          console.error('Error:', response.status, response.statusText);
+      }
+  } catch (error) {
+      console.error('Fetch error:', error);
+  }
+  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getBookings();
+      setBookings(data);
+      
+    };
+
+    fetchData();
+  }, []); 
+  
+  console.log(bookings)
 
   const services = [
     { id: 1, name: "Dog Boarding", price: 25.99 },
@@ -56,16 +94,16 @@ const AdminDashboard = () => {
                 Manage Bookings
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bookings.map((booking) => (
+                {bookings !== undefined && bookings.map((booking) => (
                   <div
                     key={booking.id}
                     className="bg-white p-4 rounded-md shadow-md"
                   >
                     <p className="text-gray-700 font-semibold">
-                      Pet: {booking.petName}
+                      Pet: {booking.petname}
                     </p>
                     <p className="text-gray-600">
-                      Service: {booking.serviceType}
+                      Service: {booking.service}
                     </p>
                     <p
                       className={`text-${

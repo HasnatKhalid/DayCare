@@ -1,8 +1,12 @@
 // src/components/BookingForm/BookingForm.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BookingForm = () => {
+
+
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState({
     petName: "",
     petType: "",
@@ -23,13 +27,27 @@ const BookingForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try{
+      
+      const response = await fetch('http://localhost:5000/addbooking', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ petname: formData.petName, service: formData.serviceType, status:"pending" }),
+      });
+      if (response.ok){
+        navigate('/')
+      }
 
-    // Simulate checking availability on the backend
-    // In a real application, make an API call to check availability
-    // Replace the mock API call with actual backend logic
-    checkAvailability(formData.startDate);
+  }
+  catch(e){
+      console.log(e)
+  }
+    
+    //checkAvailability(formData.startDate);
   };
 
   const checkAvailability = (selectedDate) => {
@@ -160,10 +178,11 @@ const BookingForm = () => {
         </div>
 
         <Link
-          to={isFormValid ? "/payment" : "/"}
+          // to={isFormValid ? "/payment" : "/"}
           className="block w-full text-center mt-4"
         >
           <button
+          onClick={handleSubmit}
             type="submit"
             className={`w-full bg-blue-500 text-white px-4 py-2 rounded-full ${
               isFormValid ? "" : "opacity-50 cursor-not-allowed"
